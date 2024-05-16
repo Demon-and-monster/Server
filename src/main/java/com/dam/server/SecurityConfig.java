@@ -35,7 +35,7 @@ public class SecurityConfig {
         manager.addPlayer(new Player(
                 "0000",
                 "admin",
-                "{noop}password",
+                "password",
                 "yuhongweng0501@gmail.com",
                 1000
         ));
@@ -66,6 +66,7 @@ class InMemoryUserDetailsManager implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         } else {
+            System.out.println(user.getUsername());
             return new User(
                     user.getUsername(),
                     user.getPassword(),
