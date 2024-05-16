@@ -18,10 +18,6 @@ public class PlayerDetail implements UserDetails {
         return player;
     }
 
-    public String getId() {
-        return player.getId();
-    }
-
     public String getEmail() {
         return player.getEmail();
     }

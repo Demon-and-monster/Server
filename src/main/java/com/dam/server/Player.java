@@ -1,7 +1,6 @@
 package com.dam.server;
 
 public class Player {
-    private String id;
     private String username;
     private String password;
     private String email;
@@ -9,18 +8,13 @@ public class Player {
     private int rating;
     private int gameNumber;
 
-    public Player(String id, String username, String password, String email, int rating) {
-        this.id = id;
+    public Player(String username, String password, String email, int rating) {
         this.username = username;
         this.password = password;
         this.rating = rating;
         this.email = email;
         this.emailSha = HashUtil.sha256Hex(email);
         this.gameNumber = -1;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getUsername() {
