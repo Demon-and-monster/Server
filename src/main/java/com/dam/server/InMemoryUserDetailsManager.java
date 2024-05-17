@@ -19,7 +19,12 @@ class InMemoryUserDetailsManager implements UserDetailsService {
     }
 
     public Player getPlayerByUsername(String username) {
-        return users.get(username.toLowerCase()).getPlayer();
+        PlayerDetail player = users.get(username.toLowerCase());
+        if (player == null) {
+            throw new UsernameNotFoundException(username);
+        }else{
+            return player.getPlayer();
+        }
     }
 
     @Override

@@ -28,8 +28,13 @@ public class Receiver {
 
     @PostMapping("/register")
     public String register(@RequestBody RegisterBody registerBody) {
-        ((InMemoryUserDetailsManager)userDetailsService).addPlayer(registerBody.toPlayer());
-        return "";
+        try{
+            ((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(registerBody.username);
+        }catch (Exception e){
+            ((InMemoryUserDetailsManager) inMemoryUserDetailsService).addPlayer(registerBody.toPlayer());
+            return "User registered successfully";
+        }
+        return "Username already in use.";
     }
 
     @PostMapping("/lineup")
