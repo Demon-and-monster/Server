@@ -18,6 +18,10 @@ class InMemoryUserDetailsManager implements UserDetailsService {
         users.put(player.getUsername(), new PlayerDetail(player));
     }
 
+    public Player getPlayerByUsername(String username) {
+        return users.get(username.toLowerCase()).getPlayer();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails user = this.users.get(username.toLowerCase());
@@ -25,7 +29,6 @@ class InMemoryUserDetailsManager implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         } else {
-            System.out.println(user.getUsername());
             return new User(
                     user.getUsername(),
                     user.getPassword(),

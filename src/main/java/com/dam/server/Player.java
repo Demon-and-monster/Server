@@ -1,12 +1,22 @@
 package com.dam.server;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 public class Player {
     private String username;
     private String password;
     private String email;
     private String emailSha;
     private int rating;
-    private int gameNumber;
+
+    private int gameNumber = -1;
+    private int matchCount = 0;
+    private int winCount = 0;
+    private int lossCount = 0;
+    private String registerDate;
 
     public Player(String username, String password, String email, int rating) {
         this.username = username;
@@ -14,7 +24,7 @@ public class Player {
         this.rating = rating;
         this.email = email;
         this.emailSha = HashUtil.sha256Hex(email);
-        this.gameNumber = -1;
+        this.registerDate = LocalDate.now().toString();
     }
 
     public String getUsername() {
@@ -55,6 +65,22 @@ public class Player {
 
     public int getGameNumber() {
         return gameNumber;
+    }
+
+    public int getMatchCount() {
+        return matchCount;
+    }
+
+    public int getWinCount() {
+        return winCount;
+    }
+
+    public int getLossCount() {
+        return lossCount;
+    }
+
+    public String getRegisterDate() {
+        return registerDate;
     }
 
     public void lose(int opponentRating) {

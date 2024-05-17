@@ -7,7 +7,7 @@ public class RegisterBody {
     public int level;
 
     public RegisterBody(String username, String password, String email, int level) {
-        this.username = username;
+        this.username = username.toLowerCase();
         this.password = password;
         this.email = email;
         this.level = level;
