@@ -53,17 +53,17 @@ public class Receiver {
     }
 
     @GetMapping("/getGameBoard")
-    public String getGameBoard(){
+    public String getGameBoard(@RequestParam int gameNumber){
         return "";
     }
 
-    @GetMapping("/opponentMove")
-    public String opponentMove(){
+    @GetMapping("/getGameStats")
+    public String getGameStats(@RequestParam int gameNumber){
         return "";
     }
 
-    @GetMapping("/timeLeft")
-    public String timeLeft(){
+    @GetMapping("/getGamePlayer")
+    public String getGamePlayer(@RequestParam int gameNumber){
         return "";
     }
 
@@ -81,6 +81,11 @@ public class Receiver {
     public String userDetail(@RequestParam String username){
         Player player = ((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(username);
         return player.getUsername() + "," + player.getRating() + "," + player.getEmailSha() + "," + player.getWinCount() + "," + player.getLossCount() + "," + player.getMatchCount() + "," + player.getRegisterDate();
+    }
+
+    @GetMapping("/lastTenGames")
+    public String lastTenGames(@RequestParam String username){
+        return ((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(username).getGamePlayed();
     }
 
 }

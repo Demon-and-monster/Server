@@ -1,9 +1,6 @@
 package com.dam.server;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 public class Player {
     private String username;
@@ -17,6 +14,7 @@ public class Player {
     private int winCount = 0;
     private int lossCount = 0;
     private String registerDate;
+    private int[] gamePlayed = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
     public Player(String username, String password, String email, int rating) {
         this.username = username;
@@ -83,15 +81,34 @@ public class Player {
         return registerDate;
     }
 
+    public String getGamePlayed() {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < gamePlayed.length; i++) {
+            res.append(gamePlayed[i]);
+            if (i != gamePlayed.length - 1) {
+                res.append(",");
+            }
+        }
+        return res.toString();
+    }
+
+    public void play(int gameNumber) {
+        for (int i = gamePlayed.length - 1; i > 0; i--) {
+            gamePlayed[i] = gamePlayed[i - 1];
+        }
+        gamePlayed[0] = gameNumber;
+        this.gameNumber = gameNumber;
+    }
+
     public void lose(int opponentRating) {
-        rating += (int) (-32 * (1 / (Math.pow(10, (rating - opponentRating) /400d))));
+        rating += (int) (-32 * (1 / (Math.pow(10, (rating - opponentRating) / 400d))));
     }
 
     public void draw(int opponentRating) {
-        rating += (int) (32 * (0.5-(1 / (Math.pow(10, (rating - opponentRating) /400d)))));
+        rating += (int) (32 * (0.5 - (1 / (Math.pow(10, (rating - opponentRating) / 400d)))));
     }
 
     public void win(int opponentRating) {
-        rating += (int) (32 * (1-(1 / (Math.pow(10, (rating - opponentRating) /400d)))));
+        rating += (int) (32 * (1 - (1 / (Math.pow(10, (rating - opponentRating) / 400d)))));
     }
 }

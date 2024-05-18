@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/leaderBoard").permitAll()
                         .requestMatchers("/userDetail").permitAll()
+                        .requestMatchers("/lastTenGames").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
