@@ -14,6 +14,6 @@ public class RegisterBody {
     }
 
     public Player toPlayer(){
-        return new Player(username, password, email, level==0?400:level==1?800:level==2?1200:1600);
+        return new Player(username, password, email, 400*(level+1));
     }
 }
