@@ -62,6 +62,11 @@ public class Receiver {
         return "";
     }
 
+    @PostMapping("/surrender")
+    public String surrender() {
+        return "";
+    }
+
     @GetMapping("/getGameBoard")
     public String getGameBoard(@RequestParam int gameNumber) {
         return "";
