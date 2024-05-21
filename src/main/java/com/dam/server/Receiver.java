@@ -84,7 +84,7 @@ public class Receiver {
 
     @PostMapping("/editEmail")
     public String editEmail(@RequestParam String email) {
-        ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
+        ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).setEmail(email);
         return "";
     }
 
