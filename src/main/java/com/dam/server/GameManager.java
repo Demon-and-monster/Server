@@ -8,7 +8,27 @@ import java.util.ArrayList;
 public class GameManager {
     final ArrayList<Game> games = new ArrayList<Game>();
 
+    final ArrayList<Player> waitList = new ArrayList<>();
+
     public GameManager() {
+    }
+
+    public void line(){
+        synchronized(waitList){
+            while(waitList.size() >= 2){
+                //TODO
+            }
+        }
+    }
+
+    public int lineUp(Player player) {
+        synchronized (waitList) {
+            if (waitList.contains(player) || player.getGameNumber() < 0) {
+                return -1;
+            }
+            waitList.add(player);
+            return 0;
+        }
     }
 
     public Game getGame(int gameNumber) {
@@ -87,6 +107,18 @@ class Game {
         playing = false;
     }
 
+    public boolean isOnesTurn(Player player) {
+        return (blackTurn ? black.getUsername() : red.getUsername()).equals(player.getUsername());
+    }
+
+    public int getTimeLeft() {
+        if (blackTurn) {
+            return (int) ((blackTime - System.currentTimeMillis()) / 1000);
+        } else {
+            return (int) ((redTime - System.currentTimeMillis()) / 1000);
+        }
+    }
+
     //return 0 for ok, -1 for illegal move, -2 for checked, -3 for checkmate
     public int move(String action) {
         long requestTime = System.currentTimeMillis();
@@ -110,29 +142,38 @@ class Game {
         }
 
         // checked?
-        if (isChecked(action, blackTurn?'r':'b')) {
+        if (isChecked(action, blackTurn ? 'r' : 'b')) {
             return -2;
         }
 
         // checkmate?
-        // TODO
         checkmate:
         {
-            if(!isChecked(action, blackTurn?'b':'r')) {
-                break checkmate;
-            }
-
-            int[] king = {-1, -1};
-            for (int i = 0; king[0] == -1 && i < 10; i++) {
-                for (int j = 0; king[0] == -1 && j < 9; j++) {
-                    if (gameBoard[i][j].equals(blackTurn ? "r" : "b")) {
-                        king[0] = i;
-                        king[1] = j;
+            if (isChecked(action, blackTurn ? 'b' : 'r')) {
+                String[][] movedGameBoard = new String[10][9];
+                for (int i = 0; i < 9; i++) {
+                    System.arraycopy(gameBoard[i], 0, movedGameBoard[i], 0, 10);
+                }
+                for (int i = 0; i < 10; i++) {
+                    for (int j = 0; j < 9; j++) {
+                        if (gameBoard[i][j].charAt(0) == (blackTurn ? 'r' : 'b')) {
+                            for (int a = 0; i < 10; i++) {
+                                for (int b = 0; j < 9; j++) {
+                                    if (legalMove(movedGameBoard, ((char) ('a' + j)) + String.valueOf(i) + ((char) ('a' + b)) + a)) {
+                                        if (!isChecked(action, ((char) ('a' + j)) + String.valueOf(i) + ((char) ('a' + b)) + a, (blackTurn ? 'b' : 'r'))) {
+                                            break checkmate;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-            if (legalMove(gameBoard, ('a' + king[0]) + String.valueOf(king[1]) + ('a' + king[0]) + king[1])) {
-
+                // save the move
+                moveHistory += action;
+                gameBoard[pos[1][1]][pos[1][0]] = gameBoard[pos[0][1]][pos[0][0]];
+                gameBoard[pos[0][1]][pos[0][0]] = "x";
+                return -2;
             }
         }
 
@@ -158,7 +199,7 @@ class Game {
         int[][] moves = toIntegerPosition(action);
 
         // move blank
-        if(gameBoard[moves[0][0]][moves[0][1]].equals("x")) {
+        if (gameBoard[moves[0][0]][moves[0][1]].equals("x")) {
             return false;
         }
 
@@ -317,8 +358,8 @@ class Game {
         StringBuilder dest = new StringBuilder();
         for (int i = 0; dest.toString().isBlank() && i < 10; i++) {
             for (int j = 0; dest.toString().isBlank() && j < 9; j++) {
-                if (gameBoard[i][j].equals((checker == 'b' ? 'r' : 'b')+"")) {
-                    dest.append('a' + j);
+                if (gameBoard[i][j].equals((checker == 'b' ? "r" : "b"))) {
+                    dest.append((char) ('a' + j));
                     dest.append(i);
                 }
             }
@@ -326,7 +367,40 @@ class Game {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 9; j++) {
                 if (gameBoard[i][j].charAt(0) == checker) {
-                    action = String.valueOf('a' + j) + i + dest;
+                    action = String.valueOf((char) ('a' + j)) + i + dest;
+                    if (legalMove(movedGameBoard, action)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isChecked(String action, String action2, char checker) {
+        int[][] pos = toIntegerPosition(action);
+        int[][] pos2 = toIntegerPosition(action2);
+        String[][] movedGameBoard = new String[10][9];
+        for (int i = 0; i < 9; i++) {
+            System.arraycopy(gameBoard[i], 0, movedGameBoard[i], 0, 10);
+        }
+        movedGameBoard[pos[1][1]][pos[1][0]] = movedGameBoard[pos[0][1]][pos[0][0]];
+        movedGameBoard[pos[0][1]][pos[0][0]] = "x";
+        movedGameBoard[pos2[1][1]][pos2[1][0]] = movedGameBoard[pos2[0][1]][pos2[0][0]];
+        movedGameBoard[pos2[0][1]][pos2[0][0]] = "x";
+        StringBuilder dest = new StringBuilder();
+        for (int i = 0; dest.toString().isBlank() && i < 10; i++) {
+            for (int j = 0; dest.toString().isBlank() && j < 9; j++) {
+                if (gameBoard[i][j].equals((checker == 'b' ? "r" : "b"))) {
+                    dest.append((char) ('a' + j));
+                    dest.append(i);
+                }
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (gameBoard[i][j].charAt(0) == checker) {
+                    action = String.valueOf((char) ('a' + j)) + i + dest;
                     if (legalMove(movedGameBoard, action)) {
                         return true;
                     }

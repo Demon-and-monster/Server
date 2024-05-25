@@ -10,6 +10,9 @@ import java.util.Date;
 
 @RestController
 public class Receiver {
+    // below is the way to get user
+    // ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername())
+
     @Autowired
     SecurityConfig securityConfig;
 
@@ -21,6 +24,8 @@ public class Receiver {
 
     @Autowired
     LeaderBoard leaderBoard;
+    @Autowired
+    private GameManager gameManager;
 
     @GetMapping("/test")
     public String test() {
@@ -44,7 +49,7 @@ public class Receiver {
 
     @PostMapping("/lineup")
     public String lineup() {
-        return "";
+        return String.valueOf(gameManager.lineUp(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername())));
     }
 
     @PostMapping("/leftLine")
@@ -59,33 +64,46 @@ public class Receiver {
 
     @PostMapping("/action")
     public String action(@RequestParam String action) {
-        return "";
+        if (((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() < 0) {
+            return "-1";
+        } else if (!gameManager.getGame(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber()).isOnesTurn(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()))) {
+            return "1";
+        }
+        return String.valueOf(-gameManager.getGame(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber()).move(action));
     }
 
     @PostMapping("/surrender")
     public String surrender() {
-        return "";
+        if (((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() < 0) {
+            return "-1";
+        }
+        gameManager.getGame(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber()).surrender(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()));
+
+        return "0";
     }
 
     @GetMapping("/getGameBoard")
     public String getGameBoard(@RequestParam int gameNumber) {
-        return "";
+        int num = gameNumber == -1 ? ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() : gameNumber;
+        return num < 0 ? "-1" : gameManager.getGame(num).getMoveHistory();
     }
 
     @GetMapping("/getGameStats")
     public String getGameStats(@RequestParam int gameNumber) {
-        return "";
+        int num = gameNumber == -1 ? ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() : gameNumber;
+        return num < 0 ? "-1" : gameManager.getGame(num).playing + "," + gameManager.getGame(num).blackTurn + "," + gameManager.getGame(num).getTimeLeft() + "," + num;
     }
 
     @GetMapping("/getGamePlayer")
     public String getGamePlayer(@RequestParam int gameNumber) {
-        return "";
+        int num = gameNumber == -1 ? ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() : gameNumber;
+        return num < 0 ? "-1" : gameManager.getGame(num).black.getUsername() + "," + gameManager.getGame(num).red.getUsername();
     }
 
     @PostMapping("/editEmail")
     public String editEmail(@RequestParam String email) {
-        ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).setEmail(email);
-        return "";
+        ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).setEmail(email);
+        return "0";
     }
 
     @GetMapping("leaderBoard")
@@ -106,29 +124,29 @@ public class Receiver {
 
     @GetMapping("/friends")
     public String friends() {
-        return ((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getFriendsString();
+        return ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getFriendsString();
     }
 
     @PostMapping("/addFriend")
     public String addFriend(@RequestParam String username) {
         Player player;
-        try{
+        try {
             player = ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(username);
-        }catch (Exception e){
+        } catch (Exception e) {
             return "-1";
         }
-        player.addFriend(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
+        player.addFriend(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
         return "0";
     }
 
     @GetMapping("/getFriendRequests")
     public String getFriendRequests() {
-        return ((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getRequestFriendsString();
+        return ((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getRequestFriendsString();
     }
 
     @GetMapping("/confirmFriendRequest")
     public String confirmFriendRequest(@RequestParam String username) {
-        return String.valueOf(((InMemoryUserDetailsManager)inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).acceptFriend(username));
+        return String.valueOf(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).acceptFriend(username));
     }
 
     @PostMapping("/playWithFriend")

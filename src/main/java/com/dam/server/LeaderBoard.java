@@ -42,6 +42,10 @@ public class LeaderBoard {
         }
         return res.toString();
     }
+
+    public void line() {
+
+    }
 }
 
 
