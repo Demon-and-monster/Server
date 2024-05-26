@@ -54,12 +54,25 @@ public class Receiver {
 
     @PostMapping("/leftLine")
     public String leftLine() {
-        return "";
+        return gameManager.leftLine(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername())) ? "0" : "-1";
     }
 
     @GetMapping("/lineup")
     public String lineup2() {
-        return "";
+        if(gameManager.inLine(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()))){
+            return "0";
+        }else{
+            if(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber() < 0){
+                return "-1";
+            }else{
+                Game game = gameManager.getGame(((InMemoryUserDetailsManager) inMemoryUserDetailsService).getPlayerByUsername(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).getGameNumber());
+                if(game.black.getUsername().equals(((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername())){
+                    return game.red.getUsername() + "," + 0;
+                }else{
+                    return game.black.getUsername() + "," + 1;
+                }
+            }
+        }
     }
 
     @PostMapping("/action")

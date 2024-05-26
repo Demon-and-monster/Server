@@ -16,7 +16,7 @@ public class GameManager {
     public void line(){
         synchronized(waitList){
             while(waitList.size() >= 2){
-                //TODO
+                newGame(waitList.remove(0),waitList.remove(0),true);
             }
         }
     }
@@ -28,6 +28,23 @@ public class GameManager {
             }
             waitList.add(player);
             return 0;
+        }
+    }
+
+    public boolean leftLine(Player player){
+        synchronized (waitList) {
+            if (waitList.contains(player)) {
+                waitList.remove(player);
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
+    public boolean inLine(Player player){
+        synchronized (waitList) {
+            return waitList.contains(player);
         }
     }
 
