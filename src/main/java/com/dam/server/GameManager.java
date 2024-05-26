@@ -5,25 +5,26 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 @Service
-public class GameManager {
+public class GameManager extends Thread {
     final ArrayList<Game> games = new ArrayList<Game>();
 
     final ArrayList<Player> waitList = new ArrayList<>();
 
     public GameManager() {
+        this.start();
     }
 
-    public void line(){
-        synchronized(waitList){
-            while(waitList.size() >= 2){
-                newGame(waitList.remove(0),waitList.remove(0),true);
+    public void line() {
+        synchronized (waitList) {
+            while (waitList.size() >= 2) {
+                newGame(waitList.remove(0), waitList.remove(0), true);
             }
         }
     }
 
     public int lineUp(Player player) {
         synchronized (waitList) {
-            if (waitList.contains(player) || player.getGameNumber() < 0) {
+            if (waitList.contains(player) || player.getGameNumber() > 0) {
                 return -1;
             }
             waitList.add(player);
@@ -31,18 +32,18 @@ public class GameManager {
         }
     }
 
-    public boolean leftLine(Player player){
+    public boolean leftLine(Player player) {
         synchronized (waitList) {
             if (waitList.contains(player)) {
                 waitList.remove(player);
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
     }
 
-    public boolean inLine(Player player){
+    public boolean inLine(Player player) {
         synchronized (waitList) {
             return waitList.contains(player);
         }
@@ -58,6 +59,16 @@ public class GameManager {
             games.add(game);
             black.play(games.size() - 1);
             red.play(games.size() - 1);
+        }
+    }
+
+    @Override
+    public void run() {
+        long lastTime = System.currentTimeMillis();
+        while (true) {
+            if (System.currentTimeMillis() - lastTime > 1000) {
+                this.line();
+            }
         }
     }
 }

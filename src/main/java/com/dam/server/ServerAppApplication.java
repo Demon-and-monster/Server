@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ServerAppApplication {
+public class ServerAppApplication extends Thread {
 
     @Autowired
     public GameManager gameManager;
@@ -15,18 +15,6 @@ public class ServerAppApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ServerAppApplication.class, args);
-        new ServerAppApplication().start();
-    }
-
-    public void start() {
-        while (true) {
-            try {
-                wait(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            gameManager.line();
-        }
     }
 
 }
